@@ -1,0 +1,16 @@
+{
+"title" : "Evently",
+"onBoardingTitle" :"Personalize Your Experience",
+"onBoardingDes" :"Choose your preferred theme and language to get started with a comfortable, tailored experience that suits your style.",
+"language" :"Language",
+"theme" :"Theme",
+"email":"Email",
+"password":"Password",
+"forgetPassword":"Forget Password?",
+"login": "Login",
+"notHaveAccount" : "Don’t Have Account ? ",
+"createAccount" : "Create Account",
+"name" : "Name",
+"rePassword" : "RePassword",
+"haveAccount" : "Already Have Account ? "
+}

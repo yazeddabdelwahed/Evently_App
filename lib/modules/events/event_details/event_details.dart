@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constant/categorys.dart';
+import '../../../core/routes/app_route_name.dart';
 import '../../../core/theme/app_colors.dart';
 
 class EventDetails extends StatelessWidget {
@@ -24,7 +25,9 @@ class EventDetails extends StatelessWidget {
             ),
             actions: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, RouteName.editEvent, arguments: eventModel);
+                },
                 icon: const Icon(Icons.edit),
               ),
               IconButton(

@@ -48,4 +48,41 @@ class EventProvider extends ChangeNotifier {
   Future<void> deleteEvent(String id) async {
     return EventServices.deleteEvent(id);
   }
+
+  void setEvent(EventModel event) {
+    var index = CategoryData.categories
+        .indexWhere((category) => category.id == event.categoryId);
+    if (index != -1) {
+      tabIndex = index;
+    }
+    selectedDateTime = DateTime.parse(event.date);
+
+    timeOfDay = TimeOfDay(
+        hour: selectedDateTime!.hour,
+        minute: selectedDateTime!.minute
+    );
+
+    titleController.text = event.title;
+    descriptionController.text = event.desc;
+  }
+
+  Future<void> updateEvent(EventModel eventModel, BuildContext context) async {
+    eventModel.desc = descriptionController.text;
+    eventModel.title = titleController.text;
+    eventModel.categoryId = CategoryData.categories[tabIndex].id;
+    eventModel.image = CategoryData.categories[tabIndex].image;
+    if (timeOfDay != null) {
+      eventModel.time = timeOfDay!.format(context);
+    }
+    if (selectedDateTime != null) {
+      eventModel.date = DateTime(
+              selectedDateTime!.year,
+              selectedDateTime!.month,
+              selectedDateTime!.day,
+              timeOfDay?.hour ?? 0,
+              timeOfDay?.minute ?? 0)
+          .toString();
+      await EventServices.updateEvent(eventModel);
+    }
+  }
 }

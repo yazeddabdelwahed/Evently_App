@@ -7,4 +7,5 @@ class RouteName{
   static const String layout = "layout";
   static const String addEvent = "add-event";
   static const String eventDetails = "event-details";
+  static const String editEvent = "edit_event";
 }

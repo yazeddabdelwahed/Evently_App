@@ -44,4 +44,8 @@ class EventProvider extends ChangeNotifier {
     notifyListeners();
     Navigator.pop(context);
   }
+
+  Future<void> deleteEvent(String id) async {
+    return EventServices.deleteEvent(id);
+  }
 }

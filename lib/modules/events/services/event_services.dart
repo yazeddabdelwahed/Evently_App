@@ -22,4 +22,10 @@ class EventServices {
     eventModel.id = doc.id;
     doc.set(eventModel);
   }
+
+  static Future<void> deleteEvent(String id) async{
+    var ref = getCollectionRef();
+    var doc = ref.doc(id);
+    await doc.delete();
+  }
 }

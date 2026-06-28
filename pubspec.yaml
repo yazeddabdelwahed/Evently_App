@@ -47,6 +47,8 @@ dependencies:
   icons_plus:
   cloud_firestore:
   shared_preferences:
+  location: ^8.0.1
+  google_maps_flutter: ^2.14.2
     
 dev_dependencies:
   flutter_test:

@@ -1,15 +1,18 @@
+import 'package:evently_c16_online/core/provider/location_provider.dart';
 import 'package:evently_c16_online/core/routes/app_route_name.dart';
 import 'package:evently_c16_online/modules/auth/pages/forget_password_screen.dart';
 import 'package:evently_c16_online/modules/auth/pages/login_screen.dart';
 import 'package:evently_c16_online/modules/auth/pages/register_screen.dart';
 import 'package:evently_c16_online/modules/events/edit_event/edit_event.dart';
 import 'package:evently_c16_online/modules/events/event_details/event_details.dart';
-import 'package:evently_c16_online/modules/events/pages/add_event_screen.dart';
+import 'package:evently_c16_online/modules/events/pick_event_location/event_map.dart';
 import 'package:evently_c16_online/modules/layout/pages/layout_screen.dart';
 import 'package:evently_c16_online/modules/onboarding/pages/onboarding_screen.dart';
 import 'package:evently_c16_online/modules/splash/pages/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 
+import '../../modules/events/add_event/add_event_screen.dart';
 import '../models/event_model.dart';
 
 class RouteGen {
@@ -74,6 +77,16 @@ class RouteGen {
           var event = settings.arguments as EventModel;
           return MaterialPageRoute(
               builder: (_) => EditEvent(eventModel: event));
+        }
+      case RouteName.eventMap:
+        {
+          final event = settings.arguments as EventModel?;
+          return MaterialPageRoute(
+            builder: (_) => EventMap(
+              locationProvider: LocationProvider(),
+              eventModel: event,
+            ),
+          );
         }
       default:
         return PageRouteBuilder(

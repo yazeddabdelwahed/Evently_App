@@ -8,4 +8,5 @@ class RouteName{
   static const String addEvent = "add-event";
   static const String eventDetails = "event-details";
   static const String editEvent = "edit_event";
+  static const String eventMap = "event_map";
 }

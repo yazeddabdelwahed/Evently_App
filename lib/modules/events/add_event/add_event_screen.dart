@@ -1,31 +1,54 @@
 import 'package:evently_c16_online/core/constant/categorys.dart';
+import 'package:evently_c16_online/core/provider/location_provider.dart';
 import 'package:evently_c16_online/core/widgets/custom_btn.dart';
 import 'package:evently_c16_online/modules/events/manager/event_provider.dart';
+import 'package:evently_c16_online/modules/events/pick_event_location/event_map.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart'; // Add this for LatLng
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_colors.dart';
 
-class AddEventScreen extends StatelessWidget {
+class AddEventScreen extends StatefulWidget {
   const AddEventScreen({super.key});
+
+  @override
+  State<AddEventScreen> createState() => _AddEventScreenState();
+}
+
+class _AddEventScreenState extends State<AddEventScreen> {
+  late LocationProvider locationProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    locationProvider = LocationProvider();
+  }
 
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
-    return ChangeNotifierProvider(
-        create: (context) => EventProvider(),
-        child: Consumer<EventProvider>(
-          builder: (context, provider, child) {
+
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => EventProvider(locationProvider: locationProvider)),
+          ChangeNotifierProvider.value(value: locationProvider),
+        ],
+        child: Consumer2<EventProvider, LocationProvider>(
+          builder: (context, eventProvider, locProvider, child) {
             return Scaffold(
-              bottomNavigationBar: Container(
-                padding: const EdgeInsets.all(12),
-                child: CustomBtn(
-                    onTap: () {
-                      provider.addEvent(context);
-                    },
-                    text: "Add Event"),
+              bottomNavigationBar: SafeArea(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  child: CustomBtn(
+                      onTap: () {
+                        eventProvider.addEvent(context);
+                      },
+                      text: "Add Event"),
+                ),
               ),
               appBar: AppBar(
                 title: const Text("Add Event"),
@@ -38,7 +61,7 @@ class AddEventScreen extends StatelessWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(16),
                       child: Image.asset(
-                        CategoryData.categories[provider.tabIndex].image,
+                        CategoryData.categories[eventProvider.tabIndex].image,
                         excludeFromSemantics: true,
                         gaplessPlayback: true,
                       ),
@@ -49,7 +72,7 @@ class AddEventScreen extends StatelessWidget {
                     DefaultTabController(
                         length: CategoryData.categories.length,
                         child: TabBar(
-                            onTap: provider.onTabChange,
+                            onTap: eventProvider.onTabChange,
                             dividerColor: Colors.transparent,
                             indicatorColor: Colors.transparent,
                             indicatorPadding: const EdgeInsets.all(4),
@@ -60,9 +83,9 @@ class AddEventScreen extends StatelessWidget {
                             unselectedLabelColor: AppColors.primaryColor,
                             isScrollable: true,
                             tabs: CategoryData.categories.map(
-                              (e) {
+                                  (e) {
                                 int index = CategoryData.categories.indexOf(e);
-                                bool isSelected = index == provider.tabIndex;
+                                bool isSelected = index == eventProvider.tabIndex;
                                 return Tab(
                                   child: Container(
                                     padding: const EdgeInsets.all(6),
@@ -98,13 +121,13 @@ class AddEventScreen extends StatelessWidget {
                       onTapOutside: (event) {
                         FocusManager.instance.primaryFocus!.unfocus();
                       },
-                      controller: provider.titleController,
+                      controller: eventProvider.titleController,
                       decoration: const InputDecoration(
                           prefixIcon:
-                              ImageIcon(AssetImage("assets/icons/note.png")),
+                          ImageIcon(AssetImage("assets/icons/note.png")),
                           hintText: "Event Title",
                           hintStyle:
-                              TextStyle(fontSize: 18, color: Colors.grey)),
+                          TextStyle(fontSize: 18, color: Colors.grey)),
                     ),
                     const SizedBox(
                       height: 12,
@@ -116,14 +139,14 @@ class AddEventScreen extends StatelessWidget {
                         onTapOutside: (event) {
                           FocusManager.instance.primaryFocus!.unfocus();
                         },
-                        controller: provider.descriptionController,
+                        controller: eventProvider.descriptionController,
                         textAlignVertical: TextAlignVertical.top,
                         maxLines: null,
                         expands: true,
                         decoration: const InputDecoration(
                             hintText: "Event Description",
                             hintStyle:
-                                TextStyle(fontSize: 18, color: Colors.grey)),
+                            TextStyle(fontSize: 18, color: Colors.grey)),
                       ),
                     ),
                     const SizedBox(
@@ -136,23 +159,23 @@ class AddEventScreen extends StatelessWidget {
                         InkWell(
                           onTap: () {
                             showDatePicker(
-                                    context: context,
-                                    firstDate: DateTime.now(),
-                                    initialDate: provider.selectedDateTime,
-                                    lastDate: DateTime.now()
-                                        .add(const Duration(days: 60)))
+                                context: context,
+                                firstDate: DateTime.now(),
+                                initialDate: eventProvider.selectedDateTime,
+                                lastDate: DateTime.now()
+                                    .add(const Duration(days: 60)))
                                 .then(
-                              (value) {
-                                provider
+                                  (value) {
+                                eventProvider
                                     .onSelectedDate(value ?? DateTime.now());
                               },
                             );
                           },
                           child: Text(
-                            provider.selectedDateTime == null
+                            eventProvider.selectedDateTime == null
                                 ? "Choose Date"
                                 : DateFormat("y / M / d")
-                                    .format(provider.selectedDateTime!),
+                                .format(eventProvider.selectedDateTime!),
                             style: TextStyle(
                                 color: AppColors.primaryColor,
                                 fontWeight: FontWeight.bold),
@@ -170,20 +193,20 @@ class AddEventScreen extends StatelessWidget {
                         InkWell(
                           onTap: () {
                             showTimePicker(
-                                    context: context,
-                                    initialTime:
-                                        provider.timeOfDay ?? TimeOfDay.now())
+                                context: context,
+                                initialTime:
+                                eventProvider.timeOfDay ?? TimeOfDay.now())
                                 .then(
-                              (value) {
-                                provider
+                                  (value) {
+                                eventProvider
                                     .onSelectedTime(value ?? TimeOfDay.now());
                               },
                             );
                           },
                           child: Text(
-                            provider.timeOfDay == null
+                            eventProvider.timeOfDay == null
                                 ? "Choose Time"
-                                : provider.timeOfDay!.format(context),
+                                : eventProvider.timeOfDay!.format(context),
                             style: TextStyle(
                                 color: AppColors.primaryColor,
                                 fontWeight: FontWeight.bold),
@@ -191,6 +214,76 @@ class AddEventScreen extends StatelessWidget {
                         )
                       ],
                     ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    // 👇 Added Event Location Row Here
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (_)=> EventMap(locationProvider: locProvider,)));
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                            border:
+                            Border.all(color: AppColors.primaryColor, width: 1),
+                            borderRadius: BorderRadius.circular(16)),
+                        child: Row(
+                          children: [
+                            Container(
+                                padding: const EdgeInsets.all(12.0),
+                                decoration: BoxDecoration(
+                                    color: AppColors.primaryColor,
+                                    borderRadius: BorderRadius.circular(8)),
+                                child: const Icon(
+                                  Icons.my_location,
+                                  weight: 35,
+                                  color: Colors.white,
+                                )),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            Expanded(
+                              child: Text(
+                                locProvider.location.isEmpty ? "location" : locProvider.location..trim(),
+                                style: GoogleFonts.inter(
+                                    color: Theme.of(context).primaryColor,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Spacer(),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              color: Theme.of(context).primaryColor,
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     const Text("Event Location : "),
+                    //     InkWell(
+                    //       onTap: () {
+                    //         // TODO: Replace this dummy coordinate with the actual logic
+                    //         // to open a Map screen or get the user's current location.
+                    //         // For now, this tests the provider with New Cairo coordinates.
+                    //         locProvider.changeLocation(const LatLng(30.0300, 31.4700));
+                    //       },
+                    //       child: Text(
+                    //         locProvider.location.isEmpty
+                    //             ? "Choose Location"
+                    //             : locProvider.location,
+                    //         style: TextStyle(
+                    //             color: AppColors.primaryColor,
+                    //             fontWeight: FontWeight.bold),
+                    //       ),
+                    //     )
+                    //   ],
+                    // ),
                   ],
                 ),
               ),

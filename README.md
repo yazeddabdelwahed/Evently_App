@@ -1,4 +1,4 @@
-# evently_c16_online
+# Evently_App
 
 A new Flutter project.
 
